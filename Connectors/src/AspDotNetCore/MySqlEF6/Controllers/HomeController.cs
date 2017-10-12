@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using MySqlEF6.Models;
 
@@ -14,35 +12,18 @@ namespace MySqlEF6.Controllers
             return View();
         }
 
-        public IActionResult About()
+        public IActionResult MySqlData([FromServices] TestContext context)
         {
-            ViewData["Message"] = "Your application description page.";
-
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Error()
-        {
-            return View();
-        }
-        public IActionResult MySqlData(
-            [FromServices] TestContext context)
-        {
-
+            var viewData = new Dictionary<string, string>();
             var td = context.TestData.ToList();
             foreach (var d in td)
             {
-                ViewData["Key" + d.Id] = d.Data;
+                viewData.Add(d.Id.ToString(), d.Data);
             }
+            ViewBag.Database = context.Database.Connection.Database;
+            ViewBag.DataSource = context.Database.Connection.DataSource;
 
-            return View();
+            return View(viewData);
         }
     }
 }

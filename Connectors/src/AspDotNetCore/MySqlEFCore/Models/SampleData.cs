@@ -11,7 +11,6 @@ namespace MySqlEFCore
     {
         internal static void InitializeMyContexts(IServiceProvider serviceProvider)
         {
-         
             if (serviceProvider == null)
             {
                 throw new ArgumentNullException("serviceProvider");
@@ -20,7 +19,6 @@ namespace MySqlEFCore
             {
                 var db = serviceScope.ServiceProvider.GetService<TestContext>();
                 db.Database.EnsureCreated();
-               
             }
             InitializeContext(serviceProvider);
         }
@@ -30,21 +28,15 @@ namespace MySqlEFCore
             using (var serviceScope = serviceProvider.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
                 var db = serviceScope.ServiceProvider.GetService<TestContext>();
-                if (DataExists<TestData>(db))
+                if (db.TestData.Any())
+                {
                     return;
+                }
 
-                AddData<TestData>(db, new TestData() { Id = 1, Data = "Test Data 1 - TestContext " });
-                AddData<TestData>(db, new TestData() { Id = 2, Data = "Test Data 2 - TestContext " });
+                AddData<TestData>(db, new TestData() { Id = 1, Data = "Test Data 1 - TestContext A" });
+                AddData<TestData>(db, new TestData() { Id = 2, Data = "Test Data 2 - TestContext B" });
                 db.SaveChanges();
             }
-        }
-
-        private static bool DataExists<TData>(DbContext db) where TData: class
-        {
-            var existingData = db.Set<TData>().ToList();
-            if (existingData.Count > 0)
-                return true;
-            return false;
         }
 
         private static void AddData<TData>(DbContext db, object item) where TData: class
